@@ -13,7 +13,7 @@ SPINE is an inductive embedding method which can simultaneously preserve the loc
 
 To run SPINE on Cora dataset, execute as:
 ```
-python main.py --input data/cora_id_edge.txt --train_prefix cora
+python main.py --input data/cora_id_edge.txt --train_prefix cora --preprocess True
 ```
 
 ### Options
@@ -23,6 +23,8 @@ To test the performance on Citeseer and Pubmed datasets, simply replace
 with corresponding edge file and dataset name contained in ``./data`` folder.
 
 To evaluate the performance by Pearson and Spearman correlation instead of classification accuracy, set ``--CORR True``.
+
+To run SPINE and SPINE-p, deactive and active ``--PRETRAIN`` respectively.
 
 For more options, please check ``main.py``.
 
