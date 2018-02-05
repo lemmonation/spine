@@ -18,9 +18,9 @@ python main.py --input data/cora_id_edge.txt --train_prefix cora --preprocess Tr
 
 ### Options
 
-To test the performance on Citeseer and Pubmed datasets, simply replace 
+<!-- To test the performance on Citeseer and Pubmed datasets, simply replace 
 ``--input`` and ``--train_prefix``
-with corresponding edge file and dataset name contained in ``./data`` folder.
+with corresponding edge file and dataset name contained in ``./data`` folder. -->
 
 To evaluate the performance by Pearson and Spearman correlation instead of classification accuracy, set ``--CORR True``.
 
