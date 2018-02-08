@@ -88,62 +88,7 @@ def feature_test(dataset, train_embeddings, test_embeddings):
 	y_test_ = sparse.coo_matrix(test_label)
 	
 	y_test = [[] for x in xrange(y_test_.shape[0])]
-	cy =	y_test_.tocoo()
-	for i, j in izip(cy.row, cy.col):
-		y_test[i].append(j)
-	y_train = np.array(y_train)
-	#y_test = np.array(y_test)
-
-	clf = TopKRanker(LogisticRegression())
-	clf.fit(train_in, y_train)
-	
-	top_k_list = [len(l) for l in y_test]
-	preds = clf.predict(test_in, top_k_list)
-	acc = accuracy_score(y_test, preds)
-	return acc
-
-def role_test(dataset, role_file, r_class, train_embeddings, test_embeddings):
-	_, _, train_data, test_data = load_pdata(dataset)
-	train_index = train_data[:, 0]
-	test_index = test_data[:, 0]
-
-	role_dic = load_roles(role_file)
-
-	test_label = []
-	for i in test_index:
-		temp = [0] * r_class
-		if i not in role_dic.keys():
-			temp[random.randint(0, r_class - 1)] += 1
-		else:
-			temp[role_dic[i]] += 1
-		test_label.append(temp)
-	test_label = np.array(test_label)
-
-	train_label = []
-	for i in train_index:
-		temp = [0] * r_class
-		if i not in role_dic.keys():
-			temp[random.randint(0, r_class - 1)] += 1
-		else:
-			temp[role_dic[i]] += 1
-		train_label.append(temp)
-	train_label = np.array(train_label)
-
-	test_in = np.asarray(test_embeddings)
-	train_in = np.asarray(train_embeddings)
-	
-	y_train_ = sparse.coo_matrix(train_label)
-	y_train = [[] for x in xrange(y_train_.shape[0])]
-	cy =	y_train_.tocoo()
-	for i, j in izip(cy.row, cy.col):
-		y_train[i].append(j)
-	
-	assert sum(len(l) for l in y_train) == y_train_.nnz
-	
-	y_test_ = sparse.coo_matrix(test_label)
-	
-	y_test = [[] for x in xrange(y_test_.shape[0])]
-	cy =	y_test_.tocoo()
+	cy = y_test_.tocoo()
 	for i, j in izip(cy.row, cy.col):
 		y_test[i].append(j)
 	y_train = np.array(y_train)

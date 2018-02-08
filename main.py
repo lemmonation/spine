@@ -13,6 +13,7 @@ import scipy.io as sio
 from scipy import spatial
 import networkx as nx
 import random
+from tqdm import tqdm
 from collections import Counter
 
 import graph
@@ -97,42 +98,32 @@ def construct_rpr_matrix(G, INDUCTIVE = False):
   		all_counts[node] = Counter()
   		for walk in walks_n:
   			all_counts[node].update(walk)
-  	out_counts = []
-  	for node in xrange(0, num_nodes):
-  		if node not in all_counts.keys():
-  			out_counts.append([0]*num_nodes)
-  			continue
-  		sum_c = sum(all_counts[node].values())
-		count_c = dict(all_counts[node])
-		temp = []
-		for i in xrange(num_nodes):
-			if i in count_c.keys():
-				temp.append(1.0 * count_c[i] / sum_c)
-			else:
-				temp.append(0)
-		out_counts.append(temp)
 
   	print("Normal random walks started...")
   	pairs = graph.write_normal_randomwalks(G, 
   		file_= './var/' + FLAGS.train_prefix + '_normal_walks.txt',rand=random.Random(FLAGS.seed))
   
   	print("Normal random walks dumped.")
-  		
-	out_counts = np.asarray(out_counts, dtype = 'double')
+ 
 	rpr_matrix = []
 	rpr_arg = []
-	for i in xrange(out_counts.shape[0]):
-		temp = np.sort(out_counts[i])[::-1]
-		temp_arg = np.argsort(out_counts[i])[::-1]
-		temp = temp[:FLAGS.k_RPR]
-		temp = np.asarray(temp, dtype = 'double')
-		temp = temp / sum(temp)
-		temp_arg = temp_arg[:FLAGS.k_RPR]
-		rpr_matrix.append(temp)
+	for node in tqdm(xrange(num_nodes)):
+		if node not in all_counts.keys():
+			raise NotImplementedError
+		temp = all_counts[node].most_common(FLAGS.k_RPR)
+		temp_arg = [i[0] for i in temp]
+		temp_value = [i[1] for i in temp]
+		if len(temp) < FLAGS.k_RPR:
+			for _ in xrange(FLAGS.k_RPR - len(temp)):
+				temp_value.append(0.0)
+				temp_arg.append(node)
+		temp_value = np.asarray(temp_value, dtype = 'double')
+		temp_value = temp_value / sum(temp_value)
+		rpr_matrix.append(temp_value)
 		rpr_arg.append(temp_arg)
 	rpr_matrix = np.asarray(rpr_matrix, dtype = 'double')
 	rpr_arg = np.asarray(rpr_arg, dtype = 'double')
-	rpr_file = './data/' + FLAGS.train_prefix + '_rpr.mat'
+	rpr_file = './var/' + FLAGS.train_prefix + '_rpr.mat'
 
 	sio.savemat(rpr_file, {'rpr_matrix':rpr_matrix})
 	return rpr_matrix, pairs, rpr_arg
@@ -159,7 +150,7 @@ def main():
 		print (" - Degree vectors dumped.")
 	else:
 		print (" - Loading precomputed Rooted PageRank matrix...")
-		rpr_file = './data/' + FLAGS.train_prefix + '_rpr.mat'
+		rpr_file = './var/' + FLAGS.train_prefix + '_rpr.mat'
 		rpr_matrix = sio.loadmat(rpr_file)['rpr_matrix']
 		rpr_arg = utils.load_pkl('./var/' + FLAGS.train_prefix + '_rpr_arg')
 		print (" - RPR matrix loaded.")
@@ -187,16 +178,16 @@ def main():
 		from gensim.models.keyedvectors import KeyedVectors
 		n2v_embedding = './baselines/{}_{}.embeddings'.format('node2vec', FLAGS.train_prefix)
 		n_model = KeyedVectors.load_word2vec_format(n2v_embedding, binary=False)
-		pretrained = np.asarray([n_model[str(node)] for node in xrange(features.shape[0])])
+		pretrained = np.asarray([n_model[str(node)] for node in xrange(rpr_matrix.shape[0])])
 		model = PretrainModel(placeholders, features, pretrained, len(G.nodes()),
-			degree_permuted, rpr_matrix, rpr_arg,
+			degree_permuted, rpr_matrix, rpr_arg, 
 			dropout = FLAGS.dropout,
 			nodevec_dim = FLAGS.dim,
 			lr = FLAGS.learning_rate,
 			logging = True)
 	else:
 		model = AggregateModel(placeholders, features, len(G.nodes()),
-			degree_permuted, rpr_matrix, rpr_arg,
+			degree_permuted, rpr_matrix, rpr_arg, 
 			dropout = FLAGS.dropout,
 			nodevec_dim = FLAGS.dim,
 			lr = FLAGS.learning_rate,
@@ -207,6 +198,7 @@ def main():
 	config.allow_soft_placement = True
 
 	sess = tf.Session(config = config)
+	saver = tf.train.Saver(max_to_keep = 5)
 	merged = tf.summary.merge_all()
 	summary_writer = tf.summary.FileWriter(log_dir(), sess.graph)
 	
