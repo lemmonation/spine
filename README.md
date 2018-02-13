@@ -1,11 +1,11 @@
 # SPINE
 This repository provides a reference implementation of the paper "SPINE: Structural Identity Preserved Inductive Network Embedding".
-SPINE is an inductive embedding method which can simultaneously preserve the local proximity and the structural identity of nodes. Details can be found here.
+SPINE is an inductive embedding method which can simultaneously preserve the local proximity and the structural identity of nodes. Details can be found [here](http://arxiv.org/abs/1802.03984).
 
 ### Requirements
 
 * tensorflow > 1.2.1
-* networkx > 1.11
+* networkx == 1.11
 * gensim > 2.3.0
 * fastdtw
 
@@ -17,9 +17,6 @@ python main.py --input data/cora_id_edge.txt --train_prefix cora --preprocess Tr
 ```
 
 ### Options
-
-<!-- To test the performance on Citeseer and Pubmed datasets, simply replace ``--input`` and ``--train_prefix``
-with corresponding edge file and dataset name contained in ``./data`` folder. -->
 
 To evaluate the performance by Pearson and Spearman correlation instead of classification accuracy, set ``--CORR True``.
 
@@ -34,5 +31,13 @@ We refer to [GraphSAGE](https://github.com/williamleif/GraphSAGE) and [GCN](http
 ### Miscellaneous
 
 Please cite our paper if you find SPINE useful in your research.
+```
+@article{guo2018spine,
+  title={SPINE: Structural Identity Preserved Inductive Network Embedding},
+  author={Guo, Junliang and Xu, Linli and Chen, Enhong},
+  journal={arXiv preprint arXiv:1802.03984},
+  year={2018}
+}
+```
 
-This is only a reference implementation of SPINE, feel free to ask any question by opening an issue or email me <leoguojl@gmail.com>.
+This is only a reference implementation of SPINE, feel free to ask any question by opening an issue or email me at <leoguojl@gmail.com>.
