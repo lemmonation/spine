@@ -32,11 +32,11 @@ We refer to [GraphSAGE](https://github.com/williamleif/GraphSAGE) and [GCN](http
 
 Please cite our paper if you find SPINE useful in your research.
 ```
-@article{guo2018spine,
+@inproceedings{guo2019spine,
   title={SPINE: Structural Identity Preserved Inductive Network Embedding},
-  author={Guo, Junliang and Xu, Linli and Chen, Enhong},
-  journal={arXiv preprint arXiv:1802.03984},
-  year={2018}
+  author={Guo, Junliang and Xu, Linli and Liu, Jingchang},
+  booktitle={Twenty-Eighth International Joint Conference on Artificial Intelligence},
+  year={2019}
 }
 ```
 
